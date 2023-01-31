@@ -1,19 +1,38 @@
 import { AccountBox, Logout, Settings } from '@mui/icons-material'
-import { AppBar, Button, Drawer, Grid, InputBase, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, Popover, Toolbar, Typography } from '@mui/material'
+import { AppBar, Box, Button, Card, CardContent, CardMedia, Drawer, Grid, InputBase, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, Popover, Toolbar, Typography } from '@mui/material'
 import { Stack } from '@mui/system'
-import React, { useState } from 'react'
+import axios from 'axios'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthContext } from '../context/authContext'
 
 const Navbar = () => {
     const { user, logOut } = useAuthContext();
     const [drawer, setDrawer] = useState(false);
-    const [search, setSearch] = useState('')
+    const [search, setSearch] = useState('');
+    const [searchResults, setSearchResults] = useState()
     const navigate = useNavigate()
     const callLogout = () => {
         logOut();
         setDrawer(false)
     }
+    useEffect(() => {
+        const getData = setTimeout(async () => {
+            setSearchResults(null)
+            const res = await axios.get(`https://www.googleapis.com/books/v1/volumes?q=${search}:keyes&${process.env.REACT_APP_GBOOKS_API_KEY}`);
+            if (res) {
+                const results = res.data.items.map(r => ({
+                    title: r.volumeInfo.title,
+                    description: r.volumeInfo.description,
+                    image: r.volumeInfo.imageLinks.smallThumbnail,
+                    author: r.volumeInfo.authors[0],
+                    rating: r.volumeInfo.averageRating
+                }));
+                setSearchResults(results)
+            }
+        }, 2000);
+        return () => clearTimeout(getData)
+    }, [search])
     return (
         <>
             <AppBar >
@@ -42,11 +61,37 @@ const Navbar = () => {
                                 zIndex: '999',
                                 top: '70px',
                                 position: 'absolute',
-                                maxWidth: '350px'
-                            }}>
-                                <Stack >
-                                    {search}
-                                </Stack>
+                                maxWidth: '350px',
+                                overflowY: 'scroll',
+                                height: '60vh'
+                            }}>{searchResults ? <Stack >
+                                <List>
+                                    {searchResults.map(r => (
+                                        <ListItem key={r.title}>
+                                            <Card sx={{ display: 'flex', justifyContent: 'space-between', width: '300px', maxWidth: '300px' }}>
+                                                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                                                    <CardContent sx={{ flex: '1 0 auto' }}>
+                                                        <Typography component="div" variant="h5">
+                                                            {r.title}
+                                                        </Typography>
+                                                        <Typography variant="subtitle1" color="text.secondary" component="div">
+                                                            {r.author}
+                                                        </Typography>
+                                                    </CardContent>
+                                                </Box>
+                                                <CardMedia
+
+                                                    component="img"
+                                                    sx={{ width: 80, mr: 0 }}
+                                                    image={r.image}
+                                                    alt="Live from space album cover"
+                                                />
+                                            </Card>
+                                        </ListItem>
+                                    ))}
+                                </List>
+                            </Stack> : <></>}
+
                             </Paper>
                         </Grid>
                         {user ?
