@@ -14,13 +14,17 @@ import {
 
 const AuthContext = createContext()
 export const AuthProvider = ({children}) => {
-    const[user,setUser] = useState();
+    const[user,setUser] = useState(null);
+    const [loading, setLoading] = useState(true)
     
-    onAuthStateChanged(auth,(user)=>{
-        if(user){
-            setUser(user)
-        }
-    })
+    useEffect(()=>{
+        const authListener = onAuthStateChanged(auth,(user)=>{
+            setUser(user);
+            setLoading(false)
+        });
+        return authListener
+    },
+    [])
     const addUsertoMongodb = async(token) =>{
         try {
             const response = await axios.post('http://localhost:5000/api/signIn',{token:token});
@@ -72,7 +76,7 @@ export const AuthProvider = ({children}) => {
         logOut,
         user
      }}>
-        {children}
+        {!loading && children}
      </AuthContext.Provider>
   )
 }

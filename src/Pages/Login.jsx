@@ -1,8 +1,15 @@
-import React, { useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../context/authContext';
 
 const Login = () => {
-    const { signInWithGoogle, signUpWithEmail, login, logOut } = useAuthContext();
+    const { signInWithGoogle, signUpWithEmail, login, logOut, user } = useAuthContext();
+    const navigate = useNavigate();
+    useEffect(() => {
+        if (user) {
+            navigate('/')
+        }
+    }, [user])
     const emailRef = useRef();
     const nameRef = useRef();
     const passwordRef = useRef();

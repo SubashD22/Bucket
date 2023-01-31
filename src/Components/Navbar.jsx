@@ -1,5 +1,5 @@
 import { AccountBox, Logout, Settings } from '@mui/icons-material'
-import { AppBar, Button, Drawer, Grid, InputBase, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography } from '@mui/material'
+import { AppBar, Button, Drawer, Grid, InputBase, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, Popover, Toolbar, Typography } from '@mui/material'
 import { Stack } from '@mui/system'
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -8,6 +8,7 @@ import { useAuthContext } from '../context/authContext'
 const Navbar = () => {
     const { user, logOut } = useAuthContext();
     const [drawer, setDrawer] = useState(false);
+    const [search, setSearch] = useState('')
     const navigate = useNavigate()
     const callLogout = () => {
         logOut();
@@ -28,12 +29,25 @@ const Navbar = () => {
                                 BUCKET
                             </Typography>
                         </Grid>
-                        <Grid item xs={8} justifyContent="center">
+                        <Grid item xs={8} justifyContent="center" position='relative'>
                             <InputBase
+                                aria-describedby='search'
                                 sx={{ ml: 3, color: 'inherit' }}
                                 placeholder="Search"
                                 inputProps={{ 'aria-label': 'search google maps' }}
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
                             />
+                            <Paper sx={{
+                                zIndex: '999',
+                                top: '70px',
+                                position: 'absolute',
+                                maxWidth: '350px'
+                            }}>
+                                <Stack >
+                                    {search}
+                                </Stack>
+                            </Paper>
                         </Grid>
                         {user ?
                             <Grid item xs={2}>
