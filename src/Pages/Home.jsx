@@ -1,12 +1,15 @@
 import { useTheme } from '@emotion/react';
 import { PlayArrow, SkipNext, SkipPrevious } from '@mui/icons-material';
-import { Card, Box, CardContent, Typography, CardMedia, IconButton } from '@mui/material';
+import { Card, Box, CardContent, Typography, CardMedia, IconButton, List, ListItem } from '@mui/material';
 import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../context/authContext'
+import { useListContext } from '../context/ListContext';
 
 const Home = () => {
     const { user } = useAuthContext();
+    const { list } = useListContext();
+    console.log(typeof (list))
     const navigate = useNavigate()
     useEffect(() => {
         if (!user) {
@@ -18,25 +21,36 @@ const Home = () => {
         <div style={{
             marginTop: '6rem'
         }}>
-            <Card sx={{ display: 'flex', maxWidth: '300px' }}>
-                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                    <CardContent sx={{ flex: '1 0 auto' }}>
-                        <Typography component="div" variant="h5">
-                            Live From Space
-                        </Typography>
-                        <Typography variant="subtitle1" color="text.secondary" component="div">
-                            Mac Miller
-                        </Typography>
-                    </CardContent>
+            {list && list.length ?
+                <List>
+                    {list.map((l, i) => {
+                        return (
+                            <ListItem>
+                                <Card sx={{ display: 'flex', justifyContent: 'space-between', width: '300px', maxWidth: '300px' }}>
+                                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                                        <CardContent sx={{ flex: '1 0 auto' }}>
+                                            <Typography component="div" variant="h5">
+                                                {l.title}
+                                            </Typography>
+                                            <Typography variant="subtitle1" color="text.secondary" component="div">
+                                                {l.author}
+                                            </Typography>
+                                        </CardContent>
+                                    </Box>
+                                    <CardMedia
 
-                </Box>
-                <CardMedia
-                    component="img"
-                    sx={{ width: 151 }}
-                    image="https://d1csarkz8obe9u.cloudfront.net/posterpreviews/contemporary-fiction-night-time-book-cover-design-template-1be47835c3058eb42211574e0c4ed8bf_screen.jpg?ts=1637012564"
-                    alt="Live from space album cover"
-                />
-            </Card>
+                                        component="img"
+                                        sx={{ width: 80, mr: 0, objectFit: 'contain' }}
+                                        image={l.image}
+                                        alt="Live from space album cover"
+                                    />
+                                </Card>
+                            </ListItem>
+                        )
+                    })}
+                </List> :
+                <Typography>List Empty</Typography>}
+
         </div>
     )
 }
