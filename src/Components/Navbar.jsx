@@ -2,7 +2,7 @@ import { AccountBox, Logout, Settings } from '@mui/icons-material'
 import { AppBar, Box, Button, Card, CardContent, CardMedia, Drawer, Grid, InputBase, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, Popover, Toolbar, Typography } from '@mui/material'
 import { Stack } from '@mui/system'
 import axios from 'axios'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useReducer, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthContext } from '../context/authContext';
 import uuid from 'react-uuid';
@@ -13,8 +13,9 @@ const Navbar = () => {
     const { user, logOut } = useAuthContext();
     const [drawer, setDrawer] = useState(false);
     const [search, setSearch] = useState('');
+    const [searchList, setSearchList] = useState()
     const { setList } = useListContext()
-    const [searchResults, setSearchResults] = useState()
+    // const [searchResults, setSearchResults] = useState()
     const navigate = useNavigate()
     const callLogout = () => {
         logOut();
@@ -26,28 +27,68 @@ const Navbar = () => {
             listItem
         ]));
         setSearch('')
+    };
+    const reducer = (state, action) => {
+        if (action.type === "Books") {
+            axios.get(`https://www.googleapis.com/books/v1/volumes?q=${search}:keyes&${process.env.REACT_APP_GBOOKS_API_KEY}`)
+                .then((res) => {
+                    const results = res.data.items.map(r => ({
+                        id: r.id,
+                        title: r.volumeInfo.title,
+                        image: r.volumeInfo.imageLinks.smallThumbnail,
+                        author: r.volumeInfo.authors?.[0],
+                        rating: r.volumeInfo.averageRating
+                    }));
+                    setSearchList(results)
+                    return
+                });
+        }
+        if (action.type === 'Games') {
+            axios.get(`https://api.rawg.io/api/games?key=59dcf7d03e874cb5afd437ed1386beca&page=1&search=${search}`)
+                .then((res) => {
+                    const results = res.data.results.map(r => ({
+                        id: r.id,
+                        title: r.name,
+                        image: r.background_image,
+                        rating: r.rating
+                    }))
+                    setSearchList(results)
+                })
+        }
+        if (action.type === 'Movies') {
+            const options = {
+                method: 'GET',
+                url: `https://imdb-movies-web-series-etc-search.p.rapidapi.com/${search}.json`,
+                headers: {
+                    'X-RapidAPI-Key': '72f62c7819msh076ebbc38b3150fp161c99jsn5b3aba7d9cd5',
+                    'X-RapidAPI-Host': 'imdb-movies-web-series-etc-search.p.rapidapi.com'
+                }
+            };
+            axios.request(options).then(function (response) {
+                const result = response.data.d.map((r) => ({
+                    id: r.id,
+                    title: r.l,
+                    image: r.i?.imageUrl,
+                    tag: r.q,
+                    year: r.y
+                }));
+                setSearchList(result)
+            }).catch(function (error) {
+                console.error(error);
+            });
+        }
     }
+    const [searchResults, dispatch] = useReducer(reducer, []);
     useEffect(() => {
         const getData = setTimeout(async () => {
-            setSearchResults(null);
+            setSearchList()
             if (search && search !== '') {
-                // const res = await axios.get(`https://www.googleapis.com/books/v1/volumes?q=${search}:keyes&${process.env.REACT_APP_GBOOKS_API_KEY}`);
-                const res = await axios.get(`https://api.rawg.io/api/games?key=59dcf7d03e874cb5afd437ed1386beca&page=2&search=${search}`)
-                console.log(res.data.results)
-                // if (res) {
-                //     const results = res.data.items.map(r => ({
-                //         id: r.id,
-                //         title: r.volumeInfo.title,
-                //         image: r.volumeInfo.imageLinks.smallThumbnail,
-                //         author: r.volumeInfo.authors?.[0],
-                //         rating: r.volumeInfo.averageRating
-                //     }));
-                //     setSearchResults(results)
-                // }
+                dispatch({ type: 'Movies' });
             }
         }, 2000);
         return () => clearTimeout(getData)
-    }, [search])
+    }, [search]);
+
     return (
         <>
             <AppBar >
@@ -71,8 +112,9 @@ const Navbar = () => {
                                 inputProps={{ 'aria-label': 'search google maps' }}
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                            />{
-                                searchResults ?
+                            />
+                            {
+                                searchList ?
                                     <Paper sx={{
                                         zIndex: '999',
                                         top: '70px',
@@ -82,10 +124,10 @@ const Navbar = () => {
                                         height: '60vh'
                                     }}> <Stack >
                                             <List>
-                                                {searchResults.map((r, i) => {
+                                                {searchList?.map((r, i) => {
                                                     return (
                                                         <ListItem key={i}>
-                                                            <ListItemButton onClick={() => callAddToList(searchResults[i])}>
+                                                            <ListItemButton onClick={() => callAddToList(searchList[i])}>
                                                                 <Card sx={{ display: 'flex', justifyContent: 'space-between', width: '300px', maxWidth: '300px' }}>
                                                                     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                                                                         <CardContent sx={{ flex: '1 0 auto' }}>
@@ -93,7 +135,10 @@ const Navbar = () => {
                                                                                 {r.title}
                                                                             </Typography>
                                                                             <Typography variant="subtitle1" color="text.secondary" component="div">
-                                                                                {r.author}
+                                                                                {r?.author || r?.tag}
+                                                                            </Typography>
+                                                                            <Typography variant="subtitle1" color="text.secondary" component="div">
+                                                                                {r?.year}
                                                                             </Typography>
                                                                         </CardContent>
                                                                     </Box>
@@ -101,7 +146,7 @@ const Navbar = () => {
 
                                                                         component="img"
                                                                         sx={{ width: 80, mr: 0, objectFit: 'contain' }}
-                                                                        image={r.image}
+                                                                        image={r?.image}
                                                                         alt="Live from space album cover"
                                                                     />
                                                                 </Card>
