@@ -1,5 +1,5 @@
-import { AccountBox, Logout, Settings } from '@mui/icons-material'
-import { AppBar, Box, Button, Card, CardContent, CardMedia, Drawer, Grid, InputBase, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper, Popover, Toolbar, Typography } from '@mui/material'
+import { AccountBox, AirplaneTicket, LocalMovies, Logout, MenuBook, Settings, SportsEsports } from '@mui/icons-material'
+import { AppBar, Box, Button, Card, CardContent, CardMedia, Drawer, FormControl, Grid, InputBase, InputLabel, List, ListItem, ListItemButton, ListItemIcon, ListItemText, MenuItem, Paper, Popover, Select, Toolbar, Typography } from '@mui/material'
 import { Stack } from '@mui/system'
 import axios from 'axios'
 import React, { useEffect, useReducer, useState } from 'react'
@@ -13,7 +13,13 @@ const Navbar = () => {
     const { user, logOut } = useAuthContext();
     const [drawer, setDrawer] = useState(false);
     const [search, setSearch] = useState('');
-    const [searchList, setSearchList] = useState()
+    const [searchList, setSearchList] = useState();
+    const [cat, setCat] = React.useState("Books");
+
+    const handleChange = (event) => {
+        setCat(event.target.value);
+        setSearch('')
+    };
     const { setList } = useListContext()
     // const [searchResults, setSearchResults] = useState()
     const navigate = useNavigate()
@@ -32,12 +38,15 @@ const Navbar = () => {
         if (action.type === "Books") {
             axios.get(`https://www.googleapis.com/books/v1/volumes?q=${search}:keyes&${process.env.REACT_APP_GBOOKS_API_KEY}`)
                 .then((res) => {
+                    console.log(res.data)
                     const results = res.data.items.map(r => ({
                         id: r.id,
                         title: r.volumeInfo.title,
                         image: r.volumeInfo.imageLinks.smallThumbnail,
                         author: r.volumeInfo.authors?.[0],
-                        rating: r.volumeInfo.averageRating
+                        rating: r.volumeInfo.averageRating,
+                        year: r.volumeInfo?.publishedDate,
+                        cat: r.volumeInfo?.categories?.[0]
                     }));
                     setSearchList(results)
                     return
@@ -46,12 +55,18 @@ const Navbar = () => {
         if (action.type === 'Games') {
             axios.get(`https://api.rawg.io/api/games?key=59dcf7d03e874cb5afd437ed1386beca&page=1&search=${search}`)
                 .then((res) => {
-                    const results = res.data.results.map(r => ({
-                        id: r.id,
-                        title: r.name,
-                        image: r.background_image,
-                        rating: r.rating
-                    }))
+                    console.log(res.data)
+                    const results = res.data.results.map(r => {
+                        const cat = r?.genres?.map(g => ([g.name]));
+                        return {
+                            id: `${r.id}`,
+                            title: r.name,
+                            image: r.background_image,
+                            rating: r.rating,
+                            year: r.released,
+                            cat: cat?.toString()
+                        }
+                    })
                     setSearchList(results)
                 })
         }
@@ -65,12 +80,38 @@ const Navbar = () => {
                 }
             };
             axios.request(options).then(function (response) {
+                console.log(response.data)
                 const result = response.data.d.map((r) => ({
                     id: r.id,
                     title: r.l,
                     image: r.i?.imageUrl,
                     tag: r.q,
                     year: r.y
+                }));
+                setSearchList(result)
+            }).catch(function (error) {
+                console.error(error);
+            });
+        };
+        if (action.type === 'Travel') {
+            const options = {
+                method: 'GET',
+                url: 'https://travel-advisor.p.rapidapi.com/locations/search',
+                params: {
+                    query: `${search}`
+                },
+                headers: {
+                    'X-RapidAPI-Key': '72f62c7819msh076ebbc38b3150fp161c99jsn5b3aba7d9cd5',
+                    'X-RapidAPI-Host': 'travel-advisor.p.rapidapi.com'
+                }
+            };
+            axios.request(options).then(function (response) {
+                const result = response.data.data.map(r => ({
+                    id: r.result_object?.location_id,
+                    title: r.result_object?.name,
+                    image: r.result_object?.photo?.images?.medium?.url,
+                    location: r.result_object?.location_string,
+                    tag: action.type
                 }));
                 setSearchList(result)
             }).catch(function (error) {
@@ -83,7 +124,7 @@ const Navbar = () => {
         const getData = setTimeout(async () => {
             setSearchList()
             if (search && search !== '') {
-                dispatch({ type: 'Movies' });
+                dispatch({ type: cat });
             }
         }, 2000);
         return () => clearTimeout(getData)
@@ -93,7 +134,7 @@ const Navbar = () => {
         <>
             <AppBar >
                 <Toolbar>
-                    <Grid container spacing={2}>
+                    <Grid container spacing={2} justifyContent='center' alignItems='center'>
                         <Grid item xs={2} textAlign='center'>
                             <Typography variant='h6'
                                 sx={{
@@ -104,7 +145,7 @@ const Navbar = () => {
                                 BUCKET
                             </Typography>
                         </Grid>
-                        <Grid item xs={8} justifyContent="center" position='relative'>
+                        <Grid item xs={8} alignItems='center' sx={{ justifyContent: 'space-between' }} position='relative'>
                             <InputBase
                                 aria-describedby='search'
                                 sx={{ ml: 3, color: 'inherit', borderBottom: '3px solid white' }}
@@ -113,6 +154,20 @@ const Navbar = () => {
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                             />
+                            <Select
+                                id="demo-simple-select-standard"
+                                value={cat}
+                                onChange={handleChange}
+                                label="Category"
+                                sx={{ ml: 3, color: 'inherit', height: 25, border: 'none', borderColor: 'transparent' }}
+                            >
+                                <MenuItem value="Books">
+                                    <MenuBook />
+                                </MenuItem>
+                                <MenuItem value='Travel'><AirplaneTicket /></MenuItem>
+                                <MenuItem value='Games'><SportsEsports /></MenuItem>
+                                <MenuItem value='Movies'><LocalMovies /></MenuItem>
+                            </Select>
                             {
                                 searchList ?
                                     <Paper sx={{
@@ -138,7 +193,7 @@ const Navbar = () => {
                                                                                 {r?.author || r?.tag}
                                                                             </Typography>
                                                                             <Typography variant="subtitle1" color="text.secondary" component="div">
-                                                                                {r?.year}
+                                                                                {r?.year || r?.location}
                                                                             </Typography>
                                                                         </CardContent>
                                                                     </Box>
@@ -171,7 +226,7 @@ const Navbar = () => {
                             </Grid> : <></>}
                     </Grid>
                 </Toolbar>
-            </AppBar>
+            </AppBar >
             <Drawer
                 anchor='right'
                 open={drawer}
