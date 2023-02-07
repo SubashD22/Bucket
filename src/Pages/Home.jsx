@@ -38,74 +38,74 @@ const Home = () => {
                 <DragDropContext onDragEnd={handleOnDragEnd}>
                     <Droppable droppableId='bucketList'>
                         {(provided) => (
-                            < Box {...provided.droppableProps} ref={provided.innerRef} width='100%'>
-                                <Masonry columns={4} spacing={2} width='100%'>
-                                    {list.map((l, i) => {
-                                        const img = new Image();
-                                        img.src = l.image;
-                                        console.log(img.height > img.width)
-                                        let card;
-                                        if (img.height >= img.width) {
-                                            card = <Card sx={{ display: 'flex', justifyContent: 'space-between', width: '300px', maxWidth: '300px', textOverflow: 'ellipsis', height: 120, padding: 0 }}>
-                                                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                                                    <CardContent sx={{ flex: '1 0 auto' }}>
-                                                        <Typography component="div" variant="h5" fontSize='1.5vw' >
-                                                            {l.title}
-                                                        </Typography>
-                                                        <Typography variant="subtitle1" color="text.secondary" component="div" fontSize='1.5vw'>
-                                                            {l?.author}
-                                                        </Typography>
-                                                        <Typography variant="subtitle1" color="text.secondary" component="div" fontSize='1.5vw'>
-                                                            {l?.cat}
-                                                        </Typography>
-                                                        <Typography variant="subtitle1" color="text.secondary" component="div" fontSize='1.5vw'>
-                                                            {l?.year}
-                                                        </Typography>
-                                                    </CardContent>
-                                                </Box>
-                                                <CardMedia
-                                                    component="img"
-                                                    sx={{ width: 80, mr: 0, objectFit: 'contain' }}
-                                                    image={l.image}
-                                                    alt="Live from space album cover"
-                                                />
-                                            </Card>
-                                        } else {
-                                            card = <Card sx={{ maxWidth: 300, fontSize: '1.5vw' }}>
-                                                <CardMedia
-                                                    component='img'
-                                                    alt="green iguana"
 
-                                                    image={l.image}
-                                                />
-                                                <CardContent>
-                                                    <Typography gutterBottom variant="h5" component="div">
+                            <List {...provided.droppableProps} ref={provided.innerRef} width='100%'>
+                                {list.map((l, i) => {
+                                    const img = new Image();
+                                    img.src = l.image;
+                                    console.log(img.height > img.width)
+                                    let card;
+                                    if (img.height >= img.width) {
+                                        card = <Card sx={{ display: 'flex', justifyContent: 'space-between', width: '300px', maxWidth: '300px', textOverflow: 'ellipsis', height: 120, padding: 0 }}>
+                                            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                                                <CardContent sx={{ flex: '1 0 auto' }}>
+                                                    <Typography component="div" variant="h5" fontSize='1rem'  >
                                                         {l.title}
                                                     </Typography>
-                                                    <Typography variant="body2" color="text.secondary">
-                                                        {l.author || l.location}
+                                                    <Typography variant="subtitle1" color="text.secondary" component="div">
+                                                        {l?.author}
                                                     </Typography>
-                                                    <Typography variant="subtitle1" color="text.secondary" component="div" fontSize='1.5vw'>
+                                                    <Typography variant="subtitle1" color="text.secondary" component="div" >
                                                         {l?.cat}
                                                     </Typography>
-                                                    <Typography variant="subtitle1" color="text.secondary" component="div" fontSize='1.5vw'>
+                                                    <Typography variant="subtitle1" color="text.secondary" component="div" >
                                                         {l?.year}
                                                     </Typography>
                                                 </CardContent>
-                                            </Card>
-                                        }
+                                            </Box>
+                                            <CardMedia
+                                                component="img"
+                                                sx={{ width: 80, mr: 0, objectFit: 'contain' }}
+                                                image={l.image}
+                                                alt="Live from space album cover"
+                                            />
+                                        </Card>
+                                    } else {
+                                        card = <Card sx={{ maxWidth: 300 }}>
+                                            <CardMedia
+                                                component='img'
+                                                alt="green iguana"
 
-                                        return (
-                                            <Draggable key={l.id} draggableId={l.id} index={i}>
-                                                {(provided) => (
-                                                    <ListItem ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                                        {card}
-                                                    </ListItem>
-                                                )}
-                                            </Draggable>)
-                                    })}
-                                </Masonry>
-                            </Box>
+                                                image={l.image}
+                                            />
+                                            <CardContent>
+                                                <Typography gutterBottom variant="h5" component="div">
+                                                    {l.title}
+                                                </Typography>
+                                                <Typography variant="body2" color="text.secondary">
+                                                    {l.author || l.location}
+                                                </Typography>
+                                                <Typography variant="subtitle1" color="text.secondary" component="div" >
+                                                    {l?.cat}
+                                                </Typography>
+                                                <Typography variant="subtitle1" color="text.secondary" component="div" >
+                                                    {l?.year}
+                                                </Typography>
+                                            </CardContent>
+                                        </Card>
+                                    }
+
+                                    return (
+                                        <Draggable key={l.id} draggableId={l.id} index={i}>
+                                            {(provided) => (
+                                                <ListItem ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                                    {card}
+                                                </ListItem>
+                                            )}
+                                        </Draggable>)
+                                })}
+                            </List>
+
                         )}
                     </Droppable>
                 </DragDropContext> :
