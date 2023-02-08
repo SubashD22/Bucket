@@ -29,8 +29,8 @@ const Navbar = () => {
     }
     const callAddToList = (listItem) => {
         setList(p => ([
-            ...p,
-            listItem
+            listItem,
+            ...p
         ]));
         setSearch('')
     };

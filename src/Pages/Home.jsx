@@ -1,30 +1,40 @@
 import { useTheme } from '@emotion/react';
-import { Padding, PlayArrow, SkipNext, SkipPrevious } from '@mui/icons-material';
-import { Masonry } from '@mui/lab';
 import { Card, Box, CardContent, Typography, CardMedia, IconButton, List, ListItem } from '@mui/material';
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { useNavigate } from 'react-router-dom';
+import Modal from '../Components/Modal';
 import { useAuthContext } from '../context/authContext'
 import { useListContext } from '../context/ListContext';
 
 const Home = () => {
     const { user } = useAuthContext();
     const { list, setList } = useListContext();
-    console.log(typeof (list))
-    const navigate = useNavigate()
+    const [open, setOpen] = useState(false);
+    const [ModalProps, setModalProps] = useState();
+    const navigate = useNavigate();
     useEffect(() => {
         if (!user) {
             navigate('/login')
         }
     }, [user]);
+    const closeModal = () => {
+        setOpen(false);
+        setModalProps(undefined)
+    }
+    const handleModal = (obj) => {
+        setModalProps(obj);
+        setOpen(true)
+    }
     const handleOnDragEnd = (result) => {
         if (!result.destination) return;
-
+        const completedIndex = list.findIndex(i => i.completed === true);
+        console.log(completedIndex - 1)
         const items = Array.from(list);
         const [reorderedItem] = items.splice(result.source.index, 1);
-        items.splice(result.destination.index, 0, reorderedItem);
-
+        items.splice(result.destination.index < list.findIndex(i => i.completed === true) ?
+            result.destination.index : list.findIndex(i => i.completed === true) - 1
+            , 0, reorderedItem)
         setList(items);
     }
     const theme = useTheme();
@@ -38,18 +48,17 @@ const Home = () => {
                 <DragDropContext onDragEnd={handleOnDragEnd}>
                     <Droppable droppableId='bucketList'>
                         {(provided) => (
-
                             <List {...provided.droppableProps} ref={provided.innerRef} width='100%'>
                                 {list.map((l, i) => {
                                     const img = new Image();
                                     img.src = l.image;
-                                    console.log(img.height > img.width)
                                     let card;
                                     if (img.height >= img.width) {
-                                        card = <Card sx={{ display: 'flex', justifyContent: 'space-between', width: '300px', maxWidth: '300px', textOverflow: 'ellipsis', height: 120, padding: 0 }}>
+                                        card = <Card sx={{ display: 'flex', justifyContent: 'space-between', width: '300px', maxWidth: '300px', height: 120, padding: 0 }}
+                                            onClick={() => handleModal(l)}>
                                             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                                                 <CardContent sx={{ flex: '1 0 auto' }}>
-                                                    <Typography component="div" variant="h5" fontSize='1rem'  >
+                                                    <Typography component="div" variant="h5" fontSize='1rem' sx={{ height: 'auto', overflowY: 'hidden', textOverflow: 'ellipsis' }} >
                                                         {l.title}
                                                     </Typography>
                                                     <Typography variant="subtitle1" color="text.secondary" component="div">
@@ -71,7 +80,8 @@ const Home = () => {
                                             />
                                         </Card>
                                     } else {
-                                        card = <Card sx={{ maxWidth: 300 }}>
+                                        card = <Card sx={{ maxWidth: 300 }}
+                                            onClick={() => handleModal(l)}>
                                             <CardMedia
                                                 component='img'
                                                 alt="green iguana"
@@ -96,7 +106,7 @@ const Home = () => {
                                     }
 
                                     return (
-                                        <Draggable key={l.id} draggableId={l.id} index={i}>
+                                        <Draggable key={l.id} draggableId={l.id} index={i} isDragDisabled={l.completed}>
                                             {(provided) => (
                                                 <ListItem ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
                                                     {card}
@@ -110,6 +120,7 @@ const Home = () => {
                     </Droppable>
                 </DragDropContext> :
                 <Typography>List Empty</Typography>}
+            <Modal open={open} props={ModalProps} close={closeModal} />
         </div>
     )
 }
