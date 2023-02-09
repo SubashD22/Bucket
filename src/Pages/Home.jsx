@@ -54,8 +54,8 @@ const Home = () => {
                                     img.src = l.image;
                                     let card;
                                     if (img.height >= img.width) {
-                                        card = <Card sx={{ display: 'flex', justifyContent: 'space-between', width: '300px', maxWidth: '300px', height: 120, padding: 0 }}
-                                            onClick={() => handleModal(l)}>
+                                        card = <Card sx={{ display: 'flex', justifyContent: 'space-between', width: '300px', maxWidth: '300px', height: 120, padding: 0, backgroundColor: l.completed && 'grey' }}
+                                            onClick={() => handleModal(l)} >
                                             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                                                 <CardContent sx={{ flex: '1 0 auto' }}>
                                                     <Typography component="div" variant="h5" fontSize='1rem' sx={{ height: 'auto', overflowY: 'hidden', textOverflow: 'ellipsis' }} >
@@ -80,7 +80,7 @@ const Home = () => {
                                             />
                                         </Card>
                                     } else {
-                                        card = <Card sx={{ maxWidth: 300 }}
+                                        card = <Card sx={{ maxWidth: 300, backgroundColor: l.completed && 'grey' }}
                                             onClick={() => handleModal(l)}>
                                             <CardMedia
                                                 component='img'

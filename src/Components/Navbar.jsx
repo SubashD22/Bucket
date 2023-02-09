@@ -1,5 +1,5 @@
-import { AccountBox, AirplaneTicket, LocalMovies, Logout, MenuBook, Settings, SportsEsports } from '@mui/icons-material'
-import { AppBar, Box, Button, Card, CardContent, CardMedia, Drawer, FormControl, Grid, InputBase, InputLabel, List, ListItem, ListItemButton, ListItemIcon, ListItemText, MenuItem, Paper, Popover, Select, Toolbar, Typography } from '@mui/material'
+import { AccountBox, AirplaneTicket, LocalMovies, Logout, MenuBook, Search, Settings, SportsEsports } from '@mui/icons-material'
+import { AppBar, Box, Button, Card, CardContent, CardMedia, Dialog, Drawer, FormControl, Grid, InputBase, InputLabel, List, ListItem, ListItemButton, ListItemIcon, ListItemText, MenuItem, Paper, Popover, Select, Toolbar, Typography } from '@mui/material'
 import { Stack } from '@mui/system'
 import axios from 'axios'
 import React, { useEffect, useReducer, useState } from 'react'
@@ -7,6 +7,8 @@ import { useNavigate } from 'react-router-dom'
 import { useAuthContext } from '../context/authContext';
 import uuid from 'react-uuid';
 import { useListContext } from '../context/ListContext'
+import SearchResults from './SearchResults'
+import { RotatingLines } from 'react-loader-spinner'
 
 
 const Navbar = () => {
@@ -14,7 +16,13 @@ const Navbar = () => {
     const [drawer, setDrawer] = useState(false);
     const [search, setSearch] = useState('');
     const [searchList, setSearchList] = useState();
+    const [loading, setLoading] = useState(false)
     const [cat, setCat] = React.useState("Books");
+
+    const onClose = () => {
+        setLoading(false);
+        setSearchList()
+    }
 
     const handleChange = (event) => {
         setCat(event.target.value);
@@ -48,8 +56,13 @@ const Navbar = () => {
                         year: r.volumeInfo?.publishedDate,
                         cat: r.volumeInfo?.categories?.[0]
                     }));
-                    setSearchList(results)
+                    setSearchList(results);
+                    setLoading(false)
                     return
+                }).catch(error => {
+                    setSearchList();
+                    setLoading(false);
+                    alert(error.message);
                 });
         }
         if (action.type === 'Games') {
@@ -67,7 +80,12 @@ const Navbar = () => {
                             cat: cat?.toString()
                         }
                     })
-                    setSearchList(results)
+                    setSearchList(results);
+                    setLoading(false);
+                }).catch(error => {
+                    setSearchList();
+                    setLoading(false);
+                    alert(error.message);
                 })
         }
         if (action.type === 'Movies') {
@@ -88,9 +106,12 @@ const Navbar = () => {
                     tag: r.q,
                     year: r.y
                 }));
-                setSearchList(result)
+                setSearchList(result);
+                setLoading(false);
             }).catch(function (error) {
-                console.error(error);
+                setSearchList();
+                setLoading(false);
+                alert(error.message);
             });
         };
         if (action.type === 'Travel') {
@@ -113,17 +134,25 @@ const Navbar = () => {
                     location: r.result_object?.location_string,
                     tag: action.type
                 }));
-                setSearchList(result)
-            }).catch(function (error) {
-                console.error(error);
-            });
+                setSearchList(result);
+                setLoading(false)
+            }).catch(error => {
+                setSearchList();
+                setLoading(false);
+                alert(error.message);
+            })
         }
     }
     const [searchResults, dispatch] = useReducer(reducer, []);
     useEffect(() => {
-        const getData = setTimeout(async () => {
+        if (!search) {
             setSearchList()
+        }
+
+        const getData = setTimeout(async () => {
+            setLoading(false)
             if (search && search !== '') {
+                setLoading(true)
                 dispatch({ type: cat });
             }
         }, 2000);
@@ -148,6 +177,7 @@ const Navbar = () => {
                         <Grid item xs={8} alignItems='center' sx={{ justifyContent: 'space-between' }} position='relative'>
                             <InputBase
                                 aria-describedby='search'
+                                id='search'
                                 sx={{ ml: 3, color: 'inherit', borderBottom: '3px solid white' }}
                                 placeholder="Search"
                                 inputProps={{ 'aria-label': 'search google maps' }}
@@ -168,15 +198,34 @@ const Navbar = () => {
                                 <MenuItem value='Games'><SportsEsports /></MenuItem>
                                 <MenuItem value='Movies'><LocalMovies /></MenuItem>
                             </Select>
+                            <SearchResults loading={loading} searchList={searchList} close={onClose} />
                             {
-                                searchList ?
+                                loading ?
                                     <Paper sx={{
                                         zIndex: '999',
                                         top: '70px',
                                         position: 'absolute',
                                         maxWidth: '350px',
                                         overflowY: 'scroll',
-                                        height: '60vh'
+                                    }}> <Stack >
+                                            <RotatingLines
+                                                strokeColor="grey"
+                                                strokeWidth="5"
+                                                animationDuration="0.75"
+                                                width="96"
+                                                visible={true}
+                                            />
+                                        </Stack>
+
+                                    </Paper> :
+                                    <Paper sx={{
+                                        zIndex: '999',
+                                        top: '70px',
+                                        position: 'absolute',
+                                        maxWidth: '350px',
+                                        overflowY: 'scroll',
+                                        height: '60vh',
+                                        visibility: searchList ? 'visible' : 'hidden'
                                     }}> <Stack >
                                             <List>
                                                 {searchList?.map((r, i) => {
@@ -212,7 +261,7 @@ const Navbar = () => {
                                             </List>
                                         </Stack>
 
-                                    </Paper> : <></>
+                                    </Paper>
                             }
 
                         </Grid>
