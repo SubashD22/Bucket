@@ -2,6 +2,7 @@ import { useTheme } from '@emotion/react';
 import { Card, Box, CardContent, Typography, CardMedia, IconButton, List, ListItem } from '@mui/material';
 import React, { useEffect, useState } from 'react'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import { RotatingLines } from 'react-loader-spinner';
 import { useNavigate } from 'react-router-dom';
 import Modal from '../Components/Modal';
 import { useAuthContext } from '../context/authContext'
@@ -9,7 +10,7 @@ import { useListContext } from '../context/ListContext';
 
 const Home = () => {
     const { user } = useAuthContext();
-    const { list, setList } = useListContext();
+    const { list, setList, isLoading } = useListContext();
     const [open, setOpen] = useState(false);
     const [ModalProps, setModalProps] = useState();
     const navigate = useNavigate();
@@ -29,15 +30,30 @@ const Home = () => {
     const handleOnDragEnd = (result) => {
         if (!result.destination) return;
         const completedIndex = list.findIndex(i => i.completed === true);
-        console.log(completedIndex - 1)
         const items = Array.from(list);
         const [reorderedItem] = items.splice(result.source.index, 1);
-        items.splice(result.destination.index < list.findIndex(i => i.completed === true) ?
-            result.destination.index : list.findIndex(i => i.completed === true) - 1
-            , 0, reorderedItem)
+        if (completedIndex >= 0) {
+            items.splice(result.destination.index < list.findIndex(i => i.completed === true) ?
+                result.destination.index : list.findIndex(i => i.completed === true) - 1
+                , 0, reorderedItem)
+        } else {
+            items.splice(result.destination.index, 0, reorderedItem)
+        }
+
         setList(items);
     }
     const theme = useTheme();
+    if (isLoading) {
+        return (
+            <RotatingLines
+                strokeColor="grey"
+                strokeWidth="5"
+                animationDuration="0.75"
+                width="96"
+                visible={true}
+            />
+        )
+    }
     return (
         <div style={{
             marginTop: '6rem',

@@ -7,22 +7,19 @@ import {QueryClientProvider, QueryClient}from 'react-query'
 import Home from './Pages/Home';
 import Login from './Pages/Login';
 
-const queryClient = new QueryClient();
+
 
 
 function App() {
   
   return (
-    <QueryClientProvider client={queryClient}>
       <Router>
       <Navbar/>
       <Routes>
         <Route path='/' element={<Home/>}/>
         <Route path='/login' element={<Login/>}/>
       </Routes>
-      </Router>
-      
-      {/* <form onSubmit={register} style={{
+       {/* <form onSubmit={register} style={{
         marginTop:'6rem'
       }}>
         <fieldset>
@@ -36,9 +33,7 @@ function App() {
           <button type='submit'>Register</button>
         </fieldset>
       </form> */}
-      
-
-    </QueryClientProvider>
+      </Router>
   );
 }
 

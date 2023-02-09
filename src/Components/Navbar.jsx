@@ -28,10 +28,11 @@ const Navbar = () => {
         setCat(event.target.value);
         setSearch('')
     };
-    const { setList } = useListContext()
+    const { setList, updatedb } = useListContext()
     // const [searchResults, setSearchResults] = useState()
     const navigate = useNavigate()
-    const callLogout = () => {
+    const callLogout = async () => {
+        await updatedb();
         logOut();
         setDrawer(false)
     }

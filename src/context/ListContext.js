@@ -1,28 +1,56 @@
-import { List } from '@mui/material';
+import axios from 'axios';
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { json } from 'react-router-dom';
+import { RotatingLines } from 'react-loader-spinner';
+import { useQuery } from 'react-query';
+import { useAuthContext } from './authContext';
 
 
-const ListContext = createContext()
+const ListContext = createContext();
 const ListProvider = ({children}) => {
-    const listData = JSON.parse(localStorage.getItem('list')); 
-    const[list,setList]=useState(listData || []);
+    const{user}= useAuthContext();
+    const userList = `${user?.uid}`+'list'
+    const localList = JSON.parse(localStorage.getItem(userList))
+    const[list,setList]=useState(localList || []);
+    const{isLoading,data,isSuccess,isError,error}=useQuery('list',async()=>{
+        const token = await user.getIdToken();
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            }
+        }
+        return axios.get('http://localhost:5000/api/getlist',config)
+    });
     useEffect(()=>{
+        if(isSuccess && data){
+           setList(data?.data)
+        }
+    },[isSuccess]);
+    const updatedb = async()=>{
+    const token = await user.getIdToken();
+    const config = {
+    headers: {
+        Authorization: `Bearer ${token}`,
+    }
+    }
+        const data = {list:list}
+        await axios.put('http://localhost:5000/api/updatelist',data,config)
+    }
+    useEffect(()=>{
+        const updatelist = async()=>{
         if(list && list.length){
-            console.log(list)
-            localStorage.setItem('list',JSON.stringify(list))
-        };
-        console.log(list)
+            localStorage.setItem(userList,JSON.stringify(list))
+            await updatedb();
+        };}
+        return () => updatelist()
     },[list]);
     const addToList =(listItem)=>{
-        console.log(listItem)
         setList(p=>([
             ...p,
             listItem
         ]))
     }
   return (
-   <ListContext.Provider value={{list,setList,addToList}}>
+   <ListContext.Provider value={{list,setList,addToList,isLoading,updatedb}}>
     {children}
    </ListContext.Provider>
   )
