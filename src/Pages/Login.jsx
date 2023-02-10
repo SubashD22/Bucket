@@ -1,5 +1,7 @@
-import React, { useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom';
+import { Google, LockOutlined } from '@mui/icons-material';
+import { Avatar, Box, Button, Container, Grid, TextField, Typography } from '@mui/material';
+import React, { useEffect, useRef, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../context/authContext';
 
 const Login = () => {
@@ -10,34 +12,94 @@ const Login = () => {
             navigate('/')
         }
     }, [user])
-    const emailRef = useRef();
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
     const nameRef = useRef();
-    const passwordRef = useRef();
     const register = async (e) => {
         e.preventDefault();
-        await signUpWithEmail(emailRef.current.value, passwordRef.current.value, nameRef.current.value)
+        await signUpWithEmail(email, password, nameRef.current.value)
     }
     const callLogin = async (e) => {
+        console.log(email)
         e.preventDefault()
-        await login(emailRef.current.value, passwordRef.current.value)
+        await login(email, password)
     }
     return (
-        <div>
-            <form onSubmit={callLogin} style={{
-                marginTop: '6rem'
-            }}>
-                <fieldset>
-                    <legend>login</legend>
-                    <input type='email' ref={emailRef} name='email' placeholder='Email' />
-                    <br />
-                    <input type='password' ref={passwordRef} name='password' placeholder='Password' />
-                    <br />
-                    <button type='submit'>Log In</button>
-                </fieldset>
-            </form>
-            <button onClick={signInWithGoogle}>Log in with Google</button>
-            <button onClick={logOut}>Log Out</button>
-        </div>
+        <Container component='main' maxWidth='xs'>
+            <Box
+                sx={{
+                    marginTop: 8,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center'
+                }}>
+                <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+                    <LockOutlined />
+                </Avatar>
+                <Typography component='h1' variant='h5'>
+                    Sign In
+                </Typography>
+                <Box component='form' onSubmit={callLogin} sx={{ mt: 1 }}>
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        id="email"
+                        label="Email Address"
+                        name="email"
+                        autoComplete="email"
+                        value={email}
+                        autoFocus
+                        variant='standard'
+                        onChange={(e) => setEmail(e.target.value)}
+                    />
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        name="password"
+                        label="Password"
+                        type="password"
+                        id="password"
+                        value={password}
+                        autoComplete="current-password"
+                        variant='standard'
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        sx={{ mt: 3, mb: 2 }}
+                    >
+                        Sign In
+                    </Button>
+
+                </Box>
+                <Typography component='h1' variant='h6'>
+                    or
+                </Typography>
+                <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    sx={{ mt: 3, mb: 2 }}
+                    endIcon={<Google />}
+                    onClick={signInWithGoogle}
+                >Sign In with
+                </Button>
+                <Button
+                    type="submit"
+                    fullWidth
+                    sx={{ mt: 3, mb: 2 }}
+                    variant='text'
+                >forgot password?
+                </Button>
+                <Link href="#" variant="body2">
+                    {"Don't have an account? Sign Up"}
+                </Link>
+            </Box>
+        </Container>
     )
 }
 
