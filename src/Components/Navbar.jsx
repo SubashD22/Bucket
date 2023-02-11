@@ -32,7 +32,7 @@ const Navbar = () => {
     // const [searchResults, setSearchResults] = useState()
     const navigate = useNavigate()
     const callLogout = async () => {
-        await updatedb();
+        setList();
         logOut();
         setDrawer(false)
     }

@@ -1,8 +1,9 @@
-import { useTheme } from '@emotion/react';
-import { Card, Box, CardContent, Typography, CardMedia, IconButton, List, ListItem } from '@mui/material';
+import { Card, Box, CardContent, Typography, CardMedia, List, ListItem } from '@mui/material';
+import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { RotatingLines } from 'react-loader-spinner';
+import { useQuery } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import Modal from '../Components/Modal';
 import { useAuthContext } from '../context/authContext'
@@ -10,15 +11,29 @@ import { useListContext } from '../context/ListContext';
 
 const Home = () => {
     const { user } = useAuthContext();
-    const { list, setList, isLoading } = useListContext();
+    const { list, setList } = useListContext();
     const [open, setOpen] = useState(false);
     const [ModalProps, setModalProps] = useState();
     const navigate = useNavigate();
+    const { isLoading, data, isSuccess, isError, error } = useQuery('list', async () => {
+        if (user) {
+            const token = await user.getIdToken();
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                }
+            }
+            return axios.get('http://localhost:5000/api/getlist', config)
+        }
+    });
     useEffect(() => {
         if (!user) {
             navigate('/login')
         }
-    }, [user]);
+        if (isSuccess && data) {
+            setList(data.data)
+        }
+    }, [user, isSuccess, data]);
     const closeModal = () => {
         setOpen(false);
         setModalProps(undefined)
@@ -42,16 +57,21 @@ const Home = () => {
 
         setList(items);
     }
-    const theme = useTheme();
     if (isLoading) {
         return (
-            <RotatingLines
-                strokeColor="grey"
-                strokeWidth="5"
-                animationDuration="0.75"
-                width="96"
-                visible={true}
-            />
+            <div style={{
+                marginTop: '6rem',
+                display: 'flex',
+                justifyContent: 'center'
+            }}>
+                <RotatingLines
+                    strokeColor="grey"
+                    strokeWidth="5"
+                    animationDuration="0.75"
+                    width="96"
+                    visible={true}
+                />
+            </div>
         )
     }
     return (
@@ -96,7 +116,7 @@ const Home = () => {
                                             />
                                         </Card>
                                     } else {
-                                        card = <Card sx={{ maxWidth: 300, backgroundColor: l.completed && 'grey' }}
+                                        card = <Card sx={{ width: 300, backgroundColor: l.completed && 'grey' }}
                                             onClick={() => handleModal(l)}>
                                             <CardMedia
                                                 component='img'

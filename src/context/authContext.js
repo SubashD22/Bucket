@@ -60,7 +60,7 @@ export const AuthProvider = ({children}) => {
           }  }
     const logOut = async()=>{
         try {
-            localStorage.clear()
+            localStorage.clear();
             await signOut(auth);
             
         } catch (error) {

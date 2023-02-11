@@ -11,20 +11,6 @@ const ListProvider = ({children}) => {
     const userList = `${user?.uid}`+'list'
     const localList = JSON.parse(localStorage.getItem(userList))
     const[list,setList]=useState(localList || []);
-    const{isLoading,data,isSuccess,isError,error}=useQuery('list',async()=>{
-        const token = await user.getIdToken();
-        const config = {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            }
-        }
-        return axios.get('http://localhost:5000/api/getlist',config)
-    });
-    useEffect(()=>{
-        if(isSuccess && data){
-           setList(data?.data)
-        }
-    },[isSuccess]);
     const updatedb = async()=>{
     const token = await user.getIdToken();
     const config = {
@@ -50,7 +36,7 @@ const ListProvider = ({children}) => {
         ]))
     }
   return (
-   <ListContext.Provider value={{list,setList,addToList,isLoading,updatedb}}>
+   <ListContext.Provider value={{list,setList,addToList,updatedb}}>
     {children}
    </ListContext.Provider>
   )
