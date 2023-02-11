@@ -1,12 +1,11 @@
-import { Google, LockOutlined } from '@mui/icons-material';
+import { AccountCircleOutlined, Google } from '@mui/icons-material';
 import { Avatar, Box, Button, Container, Grid, TextField, Typography } from '@mui/material';
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
-import PasswordResetModal from '../Components/PasswordResetModal';
 import { useAuthContext } from '../context/authContext';
 
-const Login = () => {
+const Register = () => {
     const { signInWithGoogle, signUpWithEmail, login, logOut, user } = useAuthContext();
     const navigate = useNavigate();
     useEffect(() => {
@@ -16,22 +15,21 @@ const Login = () => {
     }, [user])
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-    const [modalOpen, setModalOpen] = useState(false);
+    const [name, setname] = useState('');
     const [loading, setLoading] = useState(false)
-    const modalClose = () => setModalOpen(false)
-    const callLogin = async (e) => {
+    const register = async (e) => {
         e.preventDefault();
         setLoading(true)
         try {
-            await login(email, password);
+            await signUpWithEmail(email, password, name);
             setLoading(false)
             toast.success('login successful')
         } catch (error) {
             setLoading(false);
             toast.error(error.message)
         }
-
     }
+
     return (
         <Container component='main' maxWidth='xs'>
             <Box
@@ -42,12 +40,26 @@ const Login = () => {
                     alignItems: 'center'
                 }}>
                 <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-                    <LockOutlined />
+                    <AccountCircleOutlined />
                 </Avatar>
                 <Typography component='h1' variant='h5'>
-                    Sign In
+                    Sign Up
                 </Typography>
-                <Box component='form' onSubmit={callLogin} sx={{ mt: 1 }}>
+                <Box component='form' onSubmit={register} sx={{ mt: 1 }}>
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        type='text'
+                        id="name"
+                        label="Name"
+                        name="name"
+                        autoComplete="name"
+                        value={name}
+                        autoFocus
+                        variant='standard'
+                        onChange={(e) => setname(e.target.value)}
+                    />
                     <TextField
                         margin="normal"
                         required
@@ -55,6 +67,7 @@ const Login = () => {
                         id="email"
                         label="Email Address"
                         name="email"
+                        type='email'
                         autoComplete="email"
                         value={email}
                         autoFocus
@@ -75,12 +88,13 @@ const Login = () => {
                         onChange={(e) => setPassword(e.target.value)}
                     />
                     <Button
+                        disabled={loading}
                         type="submit"
                         fullWidth
                         variant="contained"
                         sx={{ mt: 3, mb: 2 }}
                     >
-                        Sign In
+                        Sign Up
                     </Button>
 
                 </Box>
@@ -97,22 +111,12 @@ const Login = () => {
                     onClick={signInWithGoogle}
                 >Sign In with
                 </Button>
-                <Button
-                    disabled={loading}
-                    type="submit"
-                    fullWidth
-                    sx={{ mt: 3, mb: 2 }}
-                    variant='text'
-                    onClick={() => { setModalOpen(true) }}
-                >forgot password?
-                </Button>
-                <Link to="/register" variant="body2">
-                    {"Don't have an account? Sign Up"}
+                <Link to="/login" variant="body2">
+                    {"Do you have an account? Sign In"}
                 </Link>
             </Box>
-            <PasswordResetModal open={modalOpen} close={modalClose} />
         </Container>
     )
 }
 
-export default Login
+export default Register

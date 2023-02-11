@@ -1,23 +1,26 @@
-import { AccountBox, AirplaneTicket, LocalMovies, Logout, MenuBook, Search, Settings, SportsEsports } from '@mui/icons-material'
-import { AppBar, Box, Button, Card, CardContent, CardMedia, Dialog, Drawer, FormControl, Grid, InputBase, InputLabel, List, ListItem, ListItemButton, ListItemIcon, ListItemText, MenuItem, Paper, Popover, Select, Toolbar, Typography } from '@mui/material'
+import { AirplaneTicket, LocalMovies, Logout, MenuBook, Settings, SportsEsports, Verified } from '@mui/icons-material'
+import { AppBar, Box, Button, Card, CardContent, CardMedia, Drawer, Grid, InputBase, List, ListItem, ListItemButton, ListItemIcon, ListItemText, MenuItem, Paper, Select, Toolbar, Typography } from '@mui/material'
 import { Stack } from '@mui/system'
 import axios from 'axios'
 import React, { useEffect, useReducer, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuthContext } from '../context/authContext';
-import uuid from 'react-uuid';
+
 import { useListContext } from '../context/ListContext'
 import SearchResults from './SearchResults'
 import { RotatingLines } from 'react-loader-spinner'
+import { toast } from 'react-hot-toast'
 
 
 const Navbar = () => {
-    const { user, logOut } = useAuthContext();
+    const { user, logOut, emailVerification } = useAuthContext();
     const [drawer, setDrawer] = useState(false);
     const [search, setSearch] = useState('');
     const [searchList, setSearchList] = useState();
     const [loading, setLoading] = useState(false)
     const [cat, setCat] = React.useState("Books");
+    const location = useLocation();
+
 
     const onClose = () => {
         setLoading(false);
@@ -28,13 +31,20 @@ const Navbar = () => {
         setCat(event.target.value);
         setSearch('')
     };
-    const { setList, updatedb } = useListContext()
+    const { setList } = useListContext()
     // const [searchResults, setSearchResults] = useState()
     const navigate = useNavigate()
     const callLogout = async () => {
-        setList();
         logOut();
         setDrawer(false)
+    }
+    const callEmailverification = () => {
+        try {
+            emailVerification();
+            toast.success('email sent')
+        } catch (error) {
+            toast.error(error.message)
+        }
     }
     const callAddToList = (listItem) => {
         setList(p => ([
@@ -159,7 +169,9 @@ const Navbar = () => {
         }, 2000);
         return () => clearTimeout(getData)
     }, [search]);
-
+    if (location.pathname === '/login' || location.pathname === '/register') {
+        return (<></>)
+    }
     return (
         <>
             <AppBar >
@@ -292,13 +304,22 @@ const Navbar = () => {
             >
                 <List>
                     <ListItem>
-                        <ListItemButton>
+                        <ListItemButton >
                             <ListItemIcon>
                                 <Settings />
                             </ListItemIcon>
                             <ListItemText primary='Edit' />
                         </ListItemButton>
                     </ListItem>
+                    {user?.emailVerified === false ?
+                        <ListItem>
+                            <ListItemButton onClick={callEmailverification}>
+                                <ListItemIcon>
+                                    <Verified />
+                                </ListItemIcon>
+                                <ListItemText>Verify Email</ListItemText>
+                            </ListItemButton>
+                        </ListItem> : <></>}
                     <ListItem>
                         <ListItemButton onClick={callLogout}>
                             <ListItemIcon>

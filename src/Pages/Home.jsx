@@ -14,26 +14,33 @@ const Home = () => {
     const { list, setList } = useListContext();
     const [open, setOpen] = useState(false);
     const [ModalProps, setModalProps] = useState();
+    const [isLoading, setIsLoading] = useState(false)
     const navigate = useNavigate();
-    const { isLoading, data, isSuccess, isError, error } = useQuery('list', async () => {
+    const fetchdata = async () => {
+        setIsLoading(true)
+        console.log('called')
         if (user) {
-            const token = await user.getIdToken();
+            const token = await user?.getIdToken();
             const config = {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 }
             }
-            return axios.get('http://localhost:5000/api/getlist', config)
+            const res = await axios.get('http://localhost:5000/api/getlist', config)
+            if (res.data) {
+                setList(res.data);
+                setIsLoading(false)
+            }
         }
-    });
+    };
     useEffect(() => {
         if (!user) {
             navigate('/login')
+        } if (user) {
+            fetchdata()
         }
-        if (isSuccess && data) {
-            setList(data.data)
-        }
-    }, [user, isSuccess, data]);
+
+    }, [user]);
     const closeModal = () => {
         setOpen(false);
         setModalProps(undefined)

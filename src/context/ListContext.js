@@ -1,7 +1,6 @@
 import axios from 'axios';
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { RotatingLines } from 'react-loader-spinner';
-import { useQuery } from 'react-query';
+import { toast } from 'react-hot-toast';
 import { useAuthContext } from './authContext';
 
 
@@ -12,7 +11,7 @@ const ListProvider = ({children}) => {
     const localList = JSON.parse(localStorage.getItem(userList))
     const[list,setList]=useState(localList || []);
     const updatedb = async()=>{
-    const token = await user.getIdToken();
+    const token = await user?.getIdToken();
     const config = {
     headers: {
         Authorization: `Bearer ${token}`,
@@ -23,11 +22,24 @@ const ListProvider = ({children}) => {
     }
     useEffect(()=>{
         const updatelist = async()=>{
-        if(list && list.length){
-            localStorage.setItem(userList,JSON.stringify(list))
-            await updatedb();
-        };}
-        return () => updatelist()
+               if(user){
+                localStorage.setItem(userList,JSON.stringify(list))
+                try {
+                    const token = await user?.getIdToken();
+                const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                }
+                }
+                const data = {list:list}
+                    await axios.put('http://localhost:5000/api/updatelist',data,config)
+                    toast.success('updated')  
+                } catch (error) {
+                   toast.error(error.message) 
+                }
+               }
+        }
+       updatelist()
     },[list]);
     const addToList =(listItem)=>{
         setList(p=>([
