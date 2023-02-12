@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { onAuthStateChanged, sendEmailVerification } from 'firebase/auth';
+import { onAuthStateChanged, sendEmailVerification, updateEmail} from 'firebase/auth';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import {
@@ -14,7 +14,7 @@ import {
 
 const AuthContext = createContext()
 export const AuthProvider = ({children}) => {
-    const[user,setUser] = useState(null);
+    const[user,setUser] = useState();
     const [loading, setLoading] = useState(true)
     
     useEffect(()=>{
@@ -77,6 +77,15 @@ export const AuthProvider = ({children}) => {
             console.log(error)
          }
     }
+    const changeEmail = async(email)=>{
+        console.log(email)
+        try {
+            await updateEmail(user,email);
+            toast.success('Email updated successfuly');
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
   return (
      <AuthContext.Provider value={{
         signInWithGoogle,
@@ -85,7 +94,8 @@ export const AuthProvider = ({children}) => {
         emailVerification,
         login,
         logOut,
-        user
+        user,
+        changeEmail
      }}>
         {!loading && children}
      </AuthContext.Provider>

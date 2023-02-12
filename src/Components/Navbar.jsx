@@ -64,7 +64,7 @@ const Navbar = () => {
         }, 2000);
         return () => clearTimeout(getData)
     }, [search]);
-    if (location.pathname === '/login' || location.pathname === '/register') {
+    if (location.pathname !== '/') {
         return (<></>)
     }
     return (

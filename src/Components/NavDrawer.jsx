@@ -1,11 +1,13 @@
-import { Logout, Settings, Verified } from '@mui/icons-material'
+import { Logout, ManageAccounts, Settings, Verified } from '@mui/icons-material'
 import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { toast } from 'react-hot-toast'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuthContext } from '../context/authContext'
 
 const NavDrawer = ({ drawer, setDrawer }) => {
     const { user, logOut, emailVerification } = useAuthContext();
+    const navigate = useNavigate()
     const callLogout = async () => {
         logOut();
         setDrawer(false)
@@ -33,14 +35,18 @@ const NavDrawer = ({ drawer, setDrawer }) => {
             }}
         >
             <List>
-                <ListItem>
-                    <ListItemButton >
-                        <ListItemIcon>
-                            <Settings />
-                        </ListItemIcon>
-                        <ListItemText primary='Edit' />
-                    </ListItemButton>
-                </ListItem>
+                {user?.providerData?.[0].providerId === 'password' ?
+                    <ListItem>
+                        <ListItemButton onClick={() => navigate('/editprofile')} >
+                            <ListItemIcon>
+                                <ManageAccounts />
+                            </ListItemIcon>
+                            <ListItemText primary='Edit' />
+                        </ListItemButton>
+                    </ListItem>
+                    :
+                    <></>}
+
                 {user?.emailVerified === false ?
                     <ListItem>
                         <ListItemButton onClick={callEmailverification}>
