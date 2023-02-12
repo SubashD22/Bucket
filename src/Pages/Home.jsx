@@ -3,9 +3,10 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { RotatingLines } from 'react-loader-spinner';
-import { useQuery } from 'react-query';
 import { useNavigate } from 'react-router-dom';
+import HorizontalCard from '../Components/HorizontalCard';
 import Modal from '../Components/Modal';
+import VerticalCard from '../Components/VerticalCard';
 import { useAuthContext } from '../context/authContext'
 import { useListContext } from '../context/ListContext';
 
@@ -95,70 +96,17 @@ const Home = () => {
                                 {list.map((l, i) => {
                                     const img = new Image();
                                     img.src = l.image;
-                                    let card;
-                                    if (img.height >= img.width) {
-                                        card = <Card sx={{ display: 'flex', justifyContent: 'space-between', width: '300px', maxWidth: '300px', height: 120, padding: 0, backgroundColor: l.completed && 'grey' }}
-                                            onClick={() => handleModal(l)} >
-                                            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                                                <CardContent sx={{ flex: '1 0 auto' }}>
-                                                    <Typography component="div" variant="h5" fontSize='1rem' sx={{ height: 'auto', overflowY: 'hidden', textOverflow: 'ellipsis' }} >
-                                                        {l.title}
-                                                    </Typography>
-                                                    <Typography variant="subtitle1" color="text.secondary" component="div">
-                                                        {l?.author}
-                                                    </Typography>
-                                                    <Typography variant="subtitle1" color="text.secondary" component="div" >
-                                                        {l?.cat}
-                                                    </Typography>
-                                                    <Typography variant="subtitle1" color="text.secondary" component="div" >
-                                                        {l?.year}
-                                                    </Typography>
-                                                </CardContent>
-                                            </Box>
-                                            <CardMedia
-                                                component="img"
-                                                sx={{ width: 80, mr: 0, objectFit: 'contain' }}
-                                                image={l.image}
-                                                alt="Live from space album cover"
-                                            />
-                                        </Card>
-                                    } else {
-                                        card = <Card sx={{ width: 300, backgroundColor: l.completed && 'grey' }}
-                                            onClick={() => handleModal(l)}>
-                                            <CardMedia
-                                                component='img'
-                                                alt="green iguana"
-
-                                                image={l.image}
-                                            />
-                                            <CardContent>
-                                                <Typography gutterBottom variant="h5" component="div">
-                                                    {l.title}
-                                                </Typography>
-                                                <Typography variant="body2" color="text.secondary">
-                                                    {l.author || l.location}
-                                                </Typography>
-                                                <Typography variant="subtitle1" color="text.secondary" component="div" >
-                                                    {l?.cat}
-                                                </Typography>
-                                                <Typography variant="subtitle1" color="text.secondary" component="div" >
-                                                    {l?.year}
-                                                </Typography>
-                                            </CardContent>
-                                        </Card>
-                                    }
-
                                     return (
+
                                         <Draggable key={l.id} draggableId={l.id} index={i} isDragDisabled={l.completed}>
                                             {(provided) => (
-                                                <ListItem ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                                    {card}
-                                                </ListItem>
+                                                <ListItem ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}
+                                                    onClick={() => handleModal(l)}>
+                                                    {img.height >= img.width ? <HorizontalCard item={l} /> : <VerticalCard item={l} />}                                                </ListItem>
                                             )}
                                         </Draggable>)
                                 })}
                             </List>
-
                         )}
                     </Droppable>
                 </DragDropContext> :
@@ -167,5 +115,6 @@ const Home = () => {
         </div>
     )
 }
+
 
 export default Home
