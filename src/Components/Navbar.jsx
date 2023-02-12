@@ -11,6 +11,7 @@ import SearchResults from './SearchResults'
 import { RotatingLines } from 'react-loader-spinner'
 import { toast } from 'react-hot-toast'
 import NavDrawer from './NavDrawer'
+import HorizontalCard from './HorizontalCard'
 
 
 const Navbar = () => {
@@ -139,28 +140,7 @@ const Navbar = () => {
                                                     return (
                                                         <ListItem key={i}>
                                                             <ListItemButton onClick={() => callAddToList(searchList[i])}>
-                                                                <Card sx={{ display: 'flex', justifyContent: 'space-between', width: '300px', maxWidth: '300px' }}>
-                                                                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                                                                        <CardContent sx={{ flex: '1 0 auto' }}>
-                                                                            <Typography component="div" variant="h5">
-                                                                                {r.title}
-                                                                            </Typography>
-                                                                            <Typography variant="subtitle1" color="text.secondary" component="div">
-                                                                                {r?.author || r?.tag}
-                                                                            </Typography>
-                                                                            <Typography variant="subtitle1" color="text.secondary" component="div">
-                                                                                {r?.year || r?.location}
-                                                                            </Typography>
-                                                                        </CardContent>
-                                                                    </Box>
-                                                                    <CardMedia
-
-                                                                        component="img"
-                                                                        sx={{ width: 80, mr: 0, objectFit: 'contain' }}
-                                                                        image={r?.image}
-                                                                        alt="Live from space album cover"
-                                                                    />
-                                                                </Card>
+                                                                <HorizontalCard item={r} />
                                                             </ListItemButton>
                                                         </ListItem>
                                                     )
