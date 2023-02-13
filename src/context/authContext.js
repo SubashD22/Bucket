@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { onAuthStateChanged, sendEmailVerification, updateEmail} from 'firebase/auth';
+import { onAuthStateChanged, sendEmailVerification, updateEmail, updatePassword} from 'firebase/auth';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import {
@@ -78,10 +78,17 @@ export const AuthProvider = ({children}) => {
          }
     }
     const changeEmail = async(email)=>{
-        console.log(email)
         try {
             await updateEmail(user,email);
             toast.success('Email updated successfuly');
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+    const changePassword= async(password)=>{
+        try {
+           await updatePassword(user,password);
+           toast.success('Password updated successfully'); 
         } catch (error) {
             toast.error(error.message)
         }
@@ -95,7 +102,8 @@ export const AuthProvider = ({children}) => {
         login,
         logOut,
         user,
-        changeEmail
+        changeEmail,
+        changePassword
      }}>
         {!loading && children}
      </AuthContext.Provider>

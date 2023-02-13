@@ -1,4 +1,3 @@
-import { async } from '@firebase/util';
 import { Box, Button, Container, TextField, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast';
@@ -10,7 +9,7 @@ const EditProfile = () => {
     const [password, setPassword] = useState('');
     const [cpassword, setcPassword] = useState('');
     const [loading, setLoading] = useState(false)
-    const { user, changeEmail } = useAuthContext();
+    const { user, changeEmail, changePassword } = useAuthContext();
     const navigate = useNavigate()
     useEffect(() => {
         if (!user) navigate('/')
@@ -19,6 +18,16 @@ const EditProfile = () => {
         e.preventDefault()
         setLoading(true)
         await changeEmail(email);
+        setLoading(false)
+    }
+    const callChangePassword = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        if (cpassword === password) {
+            await changePassword(password)
+        } else (
+            toast.error('password do not match')
+        )
         setLoading(false)
     }
     return (
@@ -66,16 +75,15 @@ const EditProfile = () => {
                 <Typography component='h1' variant='h5'>
                     Change Password
                 </Typography>
-                <Box component='form' onSubmit={callChangeEmail} sx={{ mt: 1 }}>
+                <Box component='form' onSubmit={callChangePassword} sx={{ mt: 1 }}>
                     <TextField
                         margin="normal"
                         required
                         fullWidth
-                        id="email"
+                        id="password"
                         label="Password"
-                        name="email"
-                        type='email'
-                        autoComplete="email"
+                        name="password"
+                        type='password'
                         value={password}
                         autoFocus
                         variant='standard'
@@ -85,10 +93,10 @@ const EditProfile = () => {
                         margin="normal"
                         required
                         fullWidth
-                        id="email"
+                        id="cpassword"
                         label="Confirm Password"
-                        name="email"
-                        type='email'
+                        name="password"
+                        type='password'
                         autoComplete="email"
                         value={cpassword}
                         autoFocus
