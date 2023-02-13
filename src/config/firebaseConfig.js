@@ -6,24 +6,22 @@ signInWithEmailAndPassword,
 createUserWithEmailAndPassword,
 sendPasswordResetEmail,
 signOut,updateProfile} from "firebase/auth";
-
-import { getAnalytics } from "firebase/analytics";
 import axios from "axios";
 const firebaseConfig = {
 
-    apiKey: "AIzaSyDDqqdWXIq9fAWOWjEWh8igmmosicZ6bWY",
+    apiKey: process.env.REACT_APP_API_KEY,
   
-    authDomain: "authapp-64622.firebaseapp.com",
+    authDomain: process.env.REACT_APP_AUTH_DOMAIN,
   
-    projectId: "authapp-64622",
+    projectId: process.env.REACT_APP_PROJECT_ID,
   
-    storageBucket: "authapp-64622.appspot.com",
+    storageBucket: process.env.REACT_APP_STORAGE_BUCKET,
   
-    messagingSenderId: "483463401726",
+    messagingSenderId:process.env.REACT_APP_MESSAGING_SENDER_ID,
   
-    appId: "1:483463401726:web:ed2860dd3b8837b570d5af",
+    appId: process.env.REACT_APP_APP_ID,
   
-    measurementId: "G-6M9GCQVHVX"
+    measurementId: process.env.REACT_APP_MEASUREMENT_ID
   
   };
 const app = initializeApp(firebaseConfig);

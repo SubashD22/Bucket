@@ -70,7 +70,7 @@ const ListProvider = ({children}) => {
                 }).catch(error => {
                     setSearchList();
                     setLoading(false);
-                    alert(error.message);
+                    toast.error(error.message);
                 });
         }
         if (action.type === 'Games') {
@@ -93,7 +93,7 @@ const ListProvider = ({children}) => {
                 }).catch(error => {
                     setSearchList();
                     setLoading(false);
-                    alert(error.message);
+                    toast.error(error.message);
                 })
         }
         if (action.type === 'Movies') {
@@ -119,7 +119,7 @@ const ListProvider = ({children}) => {
             }).catch(function (error) {
                 setSearchList();
                 setLoading(false);
-                alert(error.message);
+                toast.error(error.message);
             });
         };
         if (action.type === 'Travel') {
@@ -135,19 +135,21 @@ const ListProvider = ({children}) => {
                 }
             };
             axios.request(options).then(function (response) {
-                const result = response.data.data.map(r => ({
-                    id: r.result_object?.location_id,
-                    title: r.result_object?.name,
-                    image: r.result_object?.photo?.images?.medium?.url,
-                    location: r.result_object?.location_string,
-                    tag: action.type
-                }));
-                setSearchList(result);
+               
+                    const result = response.data.data.map(r => ({
+                        id: r.result_object?.location_id,
+                        title: r.result_object?.name,
+                        image: r.result_object?.photo?.images?.medium?.url,
+                        location: r.result_object?.location_string,
+                        tag: action.type
+                    }));
+                    setSearchList(result);
+                
                 setLoading(false)
             }).catch(error => {
                 setSearchList();
                 setLoading(false);
-                alert(error.message);
+                toast.error(error.message);
             })
         }
     }
