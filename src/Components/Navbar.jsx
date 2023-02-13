@@ -86,7 +86,7 @@ const Navbar = () => {
                             <InputBase
                                 aria-describedby='search'
                                 id='search'
-                                sx={{ ml: 3, color: 'inherit', borderBottom: '3px solid white' }}
+                                sx={{ ml: 3, color: 'inherit', borderBottom: '3px solid white', width: 130 }}
                                 placeholder="Search"
                                 inputProps={{ 'aria-label': 'search google maps' }}
                                 value={search}
@@ -97,7 +97,7 @@ const Navbar = () => {
                                 value={cat}
                                 onChange={handleChange}
                                 label="Category"
-                                sx={{ ml: 1, color: 'inherit', height: 25, border: 'none', borderColor: 'transparent', width: 50 }}
+                                sx={{ ml: 1, color: 'inherit', height: 25, border: 'none', borderColor: 'transparent' }}
                             >
                                 <MenuItem value="Books">
                                     <MenuBook />
