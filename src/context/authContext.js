@@ -28,7 +28,7 @@ export const AuthProvider = ({children}) => {
     const addUsertoMongodb = async(token) =>{
         console.log('called')
         try {
-            const response = await axios.post('http://localhost:5000/api/signIn',{token:token});
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/signIn`,{token:token});
             console.log(response.data)
             return response.data
         } catch (error) {

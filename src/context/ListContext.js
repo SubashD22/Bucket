@@ -21,7 +21,7 @@ const ListProvider = ({children}) => {
     }
     }
         const data = {list:list}
-        await axios.put('http://localhost:5000/api/updatelist',data,config)
+        await axios.put(`${process.env.REACT_APP_API_URL}/api/updatelist`,data,config)
     }
     useEffect(()=>{
         const updatelist = async()=>{
@@ -35,7 +35,7 @@ const ListProvider = ({children}) => {
                 }
                 }
                 const data = {list:list}
-                    await axios.put('http://localhost:5000/api/updatelist',data,config)
+                    await axios.put(`${process.env.REACT_APP_API_URL}/api/updatelist`,data,config)
                     toast.success('updated')  
                 } catch (error) {
                    toast.error(error.message) 
@@ -74,7 +74,7 @@ const ListProvider = ({children}) => {
                 });
         }
         if (action.type === 'Games') {
-            axios.get(`https://api.rawg.io/api/games?key=59dcf7d03e874cb5afd437ed1386beca&page=1&search=${search}`)
+            axios.get(`https://api.rawg.io/api/games?key=${process.env.REACT_APP_GAMES_API_KEY}&page=1&search=${search}`)
                 .then((res) => {
                     console.log(res.data)
                     const results = res.data.results.map(r => {
@@ -101,7 +101,7 @@ const ListProvider = ({children}) => {
                 method: 'GET',
                 url: `https://imdb-movies-web-series-etc-search.p.rapidapi.com/${search}.json`,
                 headers: {
-                    'X-RapidAPI-Key': '72f62c7819msh076ebbc38b3150fp161c99jsn5b3aba7d9cd5',
+                    'X-RapidAPI-Key': process.env.REACT_APP_RAPID_KEY,
                     'X-RapidAPI-Host': 'imdb-movies-web-series-etc-search.p.rapidapi.com'
                 }
             };
@@ -130,7 +130,7 @@ const ListProvider = ({children}) => {
                     query: `${search}`
                 },
                 headers: {
-                    'X-RapidAPI-Key': '72f62c7819msh076ebbc38b3150fp161c99jsn5b3aba7d9cd5',
+                    'X-RapidAPI-Key': process.env.REACT_APP_RAPID_KEY,
                     'X-RapidAPI-Host': 'travel-advisor.p.rapidapi.com'
                 }
             };

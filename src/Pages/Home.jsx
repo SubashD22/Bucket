@@ -27,7 +27,7 @@ const Home = () => {
                     Authorization: `Bearer ${token}`,
                 }
             }
-            const res = await axios.get('http://localhost:5000/api/getlist', config)
+            const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/getlist`, config)
             if (res.data) {
                 setList(res.data);
                 setIsLoading(false)
