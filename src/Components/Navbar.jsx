@@ -97,7 +97,7 @@ const Navbar = () => {
                                 value={cat}
                                 onChange={handleChange}
                                 label="Category"
-                                sx={{ ml: 1, color: 'inherit', height: 25, border: 'none', borderColor: 'transparent' }}
+                                sx={{ ml: 1, color: 'inherit', height: 25, border: 'none', borderColor: 'transparent', width: 50 }}
                             >
                                 <MenuItem value="Books">
                                     <MenuBook />
