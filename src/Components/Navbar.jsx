@@ -97,7 +97,7 @@ const Navbar = () => {
                                 value={cat}
                                 onChange={handleChange}
                                 label="Category"
-                                sx={{ ml: 3, color: 'inherit', height: 25, border: 'none', borderColor: 'transparent' }}
+                                sx={{ ml: 1, color: 'inherit', height: 25, border: 'none', borderColor: 'transparent' }}
                             >
                                 <MenuItem value="Books">
                                     <MenuBook />
@@ -112,6 +112,7 @@ const Navbar = () => {
                                     <Paper sx={{
                                         zIndex: '999',
                                         top: '70px',
+                                        left: '-35px',
                                         position: 'absolute',
                                         maxWidth: '350px',
                                         overflowY: 'scroll',
@@ -129,6 +130,7 @@ const Navbar = () => {
                                     <Paper sx={{
                                         zIndex: '999',
                                         top: '70px',
+                                        left: '-35px',
                                         position: 'absolute',
                                         maxWidth: '350px',
                                         overflowY: 'scroll',
