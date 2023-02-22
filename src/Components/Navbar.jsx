@@ -72,17 +72,15 @@ const Navbar = () => {
             <AppBar >
                 <Toolbar>
                     <Grid container spacing={2} justifyContent='center' alignItems='center'>
-                        <Grid item xs={2} textAlign='center'>
+                        <Grid item xs={2}>
                             <Typography variant='h6'
                                 sx={{
                                     cursor: 'pointer'
                                 }}
                                 onClick={() => navigate('/')}
-                            >
-                                BUCKET
-                            </Typography>
+                            >BUCKET</Typography>
                         </Grid>
-                        <Grid item xs={8} alignItems='center' sx={{ justifyContent: 'space-between' }} position='relative'>
+                        <Grid item xs={8} alignItems='center' sx={{ justifyContent: 'space-around' }} position='relative'>
                             <InputBase
                                 aria-describedby='search'
                                 id='search'

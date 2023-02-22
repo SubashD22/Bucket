@@ -32,6 +32,19 @@ const Login = () => {
         }
 
     }
+    const demoLogin = async (e) => {
+        e.preventDefault();
+        setLoading(true)
+        try {
+            await login('demo@email.com', process.env.REACT_APP_DEMO_PASSWORD);
+            setLoading(false)
+            toast.success('login successful')
+        } catch (error) {
+            setLoading(false);
+            toast.error(error.message)
+        }
+
+    }
     return (
         <Container component='main' maxWidth='xs'>
             <Box
@@ -81,6 +94,14 @@ const Login = () => {
                         sx={{ mt: 3, mb: 2 }}
                     >
                         Sign In
+                    </Button>
+                    <Button
+                        onClick={demoLogin}
+                        fullWidth
+                        variant="contained"
+                        sx={{ mt: 3, mb: 2 }}
+                    >
+                        Sign In as Demo
                     </Button>
 
                 </Box>
