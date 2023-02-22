@@ -5,6 +5,7 @@ import Login from './Pages/Login';
 import { Toaster } from 'react-hot-toast';
 import Register from './Pages/Register';
 import EditProfile from './Pages/EditProfile';
+import { Helmet } from 'react-helmet';
 
 
 
@@ -12,6 +13,10 @@ import EditProfile from './Pages/EditProfile';
 function App() {
   
   return (
+    <>
+     <Helmet>
+          <title>Bucket</title>
+      </Helmet>
       <Router>
       <Navbar/>
       <Toaster/>
@@ -22,6 +27,7 @@ function App() {
         <Route path='/editprofile' element={<EditProfile/>}/>
       </Routes>
       </Router>
+    </>
   );
 }
 
