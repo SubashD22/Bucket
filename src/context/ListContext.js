@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import React, { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { toast } from 'react-hot-toast';
 import { useAuthContext } from './authContext';
 
@@ -23,7 +23,7 @@ const ListProvider = ({children}) => {
         const data = {list:list}
         await axios.put(`${process.env.REACT_APP_API_URL}/api/updatelist`,data,config)
     }
-    useEffect(()=>{
+    useMemo(()=>{
         const updatelist = async()=>{
                if(user){
                 localStorage.setItem(userList,JSON.stringify(list))
